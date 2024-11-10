@@ -1,0 +1,70 @@
+name: Build
+run-name: Building
+on:
+  push:
+    branches:
+      - main
+
+env:
+  TAG_NAME: stable
+  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+jobs:
+  release:
+    name: Release
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4.2.2
+
+      - name: Check if previous release exists
+        id: check-tag
+        uses: mukunku/tag-exists-action@v1.6.0
+        with:
+          tag: ${{ env.TAG_NAME }}
+
+      - name: Delete previous release
+        if: steps.check-tag.outputs.exists == 'true'
+        run: |
+          git fetch --tags
+          gh release delete ${{ env.TAG_NAME }} -y
+          git push --delete origin ${{ env.TAG_NAME }}
+
+      - name: Create new release
+        uses: softprops/action-gh-release@v2.1.0
+        with:
+          name: Iosevka
+          tag_name: ${{ env.TAG_NAME }}
+
+  build:
+    name: Build the font
+    runs-on: ubuntu-latest
+    needs: release
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4.2.2
+
+      - name: Install Nix
+        uses: cachix/install-nix-action@v30
+        with:
+          github_access_token: ${{ env.GITHUB_TOKEN }}
+
+      - name: Nix develop
+        uses: nicknovitski/nix-develop@v1.2.1
+
+      - name: Build
+        run: |
+          npm install
+          npm run build -- ttf::Iosevka
+
+      - name: Zip files
+        run: |
+          cd dist/Iosevka/TTF
+          zip iosevka.zip ./*.ttf
+          cd ../../../
+
+      - name: Upload files
+        uses: softprops/action-gh-release@v2.1.0
+        with:
+          tag_name: ${{ env.TAG_NAME }}
+          files: dist/Iosevka/TTF/iosevka.zip
