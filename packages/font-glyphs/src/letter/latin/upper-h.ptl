@@ -74,17 +74,17 @@ glyph-block Letter-Latin-Upper-H : begin
 
 	define [EnGheShape Body df top slabType vSlab] : glyph-proc
 		local sw : AdviceStroke 2.75
-		local xRightBar : Math.min (Width - df.leftSB) : if SLAB
-			[mix df.rightSB df.leftSB 0.35] + [HSwToV : 0.5 * df.mvs]
-			mix df.rightSB df.leftSB 0.2
-		local xTopRight : mix df.width df.rightSB [if SLAB 0.25 0.375]
+		local xm : Math.min (Width - df.leftSB) : if SLAB
+			[mix df.leftSB df.rightSB 0.625] + [HSwToV : 0.25 * df.mvs]
+			mix df.leftSB df.rightSB : if (df.div > 1) (2 / 3) (3 / 4)
+		local xTopBarRightEnd : mix df.width df.rightSB : if vSlab 0.25 0.375
 
-		include : Body df.leftSB xRightBar top sw
-		include : HBar.t (xRightBar + O) xTopRight top
+		include : Body df.leftSB xm top sw
+		include : HBar.t (xm + O) xTopBarRightEnd top
 
-		include : HSerifs slabType top 0 df.leftSB xRightBar sw
+		include : HSerifs slabType top 0 df.leftSB xm sw
 		if vSlab
-			then : include : VSerif.dr xTopRight top VJut (df.mvs / HVContrast)
+			then : include : VSerif.dr xTopBarRightEnd top VJut [VSwToH df.mvs]
 			else : eject-contour 'serifRT'
 
 	define [HwairShape df top yend slabType] : glyph-proc
@@ -108,7 +108,7 @@ glyph-block Letter-Latin-Upper-H : begin
 		local yt : top - [if slabType Stroke 0]
 		return : HOverlayBar [mix SB 0 0.7] [mix RightSB Width 0.7]
 			mix yb yt 0.5
-			Math.min OverlayStroke (0.625 * (yt - yb))
+			Math.min OverlayStroke : 0.625 * (yt - yb)
 
 	define HConfig : object
 		serifless                        { HShape       HTurned HLeftHalf HRightHalf SLAB-NONE                  }
@@ -148,30 +148,34 @@ glyph-block Letter-Latin-Upper-H : begin
 			include : HSerifs slabType XH 0 SB RightSB
 
 		create-glyph "leftHalfH.\(suffix)" : glyph-proc
-			include : MarkSet.capital
-			include : LeftHalfBody SB RightSB CAP
-			include : HSerifs slabType CAP 0 SB RightSB
+			local df : include : DivFrame para.diversityF
+			include : df.markSet.capital
+			include : LeftHalfBody df.leftSB df.rightSB CAP
+			include : HSerifs slabType CAP 0 df.leftSB df.rightSB
 			eject-contour 'serifRT'
 			eject-contour 'serifRB'
 
 		create-glyph "rightHalfH.\(suffix)" : glyph-proc
-			include : MarkSet.capital
-			include : RightHalfBody SB RightSB CAP
-			include : HSerifs slabType CAP 0 SB RightSB
+			local df : include : DivFrame para.diversityF
+			include : df.markSet.capital
+			include : RightHalfBody df.leftSB df.rightSB CAP
+			include : HSerifs slabType CAP 0 df.leftSB df.rightSB
 			eject-contour 'serifLT'
 			eject-contour 'serifLB'
 
 		create-glyph "leftHalfSmcpH.\(suffix)" : glyph-proc
-			include : MarkSet.e
-			include : LeftHalfBody SB RightSB XH
-			include : HSerifs slabType XH 0 SB RightSB
+			local df : include : DivFrame para.diversityF
+			include : df.markSet.e
+			include : LeftHalfBody df.leftSB df.rightSB XH
+			include : HSerifs slabType XH 0 df.leftSB df.rightSB
 			eject-contour 'serifRT'
 			eject-contour 'serifRB'
 
 		create-glyph "rightHalfSmcpH.\(suffix)" : glyph-proc
-			include : MarkSet.e
-			include : RightHalfBody SB RightSB XH
-			include : HSerifs slabType XH 0 SB RightSB
+			local df : include : DivFrame para.diversityF
+			include : df.markSet.e
+			include : RightHalfBody df.leftSB df.rightSB XH
+			include : HSerifs slabType XH 0 df.leftSB df.rightSB
 			eject-contour 'serifLT'
 			eject-contour 'serifLB'
 
@@ -195,17 +199,17 @@ glyph-block Letter-Latin-Upper-H : begin
 		select-variant "cyrl/enghe.\(suffix)" (follow -- 'cyrl/enghe/ghePart')
 
 		create-glyph "Hwair.\(suffix)" : glyph-proc
-			local df : include : DivFrame para.diversityM 3
+			local df : include : DivFrame para.diversityMM 3
 			include : df.markSet.capital
 			include : HwairShape df CAP XH slabType
 
 		create-glyph "cyrl/NjeKomi.\(suffix)" : glyph-proc
-			local df : include : DivFrame para.diversityM 3
+			local df : include : DivFrame para.diversityMM 3
 			include : df.markSet.capital
 			include : HwairShape df CAP (CAP / 2) slabType
 
 		create-glyph "cyrl/njeKomi.\(suffix)" : glyph-proc
-			local df : include : DivFrame para.diversityM 3
+			local df : include : DivFrame para.diversityMM 3
 			include : df.markSet.e
 			include : HwairShape df XH (XH / 2) slabType
 
@@ -223,21 +227,29 @@ glyph-block Letter-Latin-Upper-H : begin
 			include : OverlayStrokeShape XH slabType
 
 		create-glyph "cyrl/EnMidHook.\(suffix)" : glyph-proc
-			local df : include : DivFrame para.diversityM 3
+			local df : include : DivFrame para.diversityMM 3
 			include : df.markSet.capDesc
 
 			local xm : df.middle + [HSwToV : 0.5 * df.mvs]
 			include : Body df.leftSB xm CAP df.mvs
-			include : HSerifs slabType CAP 0 df.leftSB xm df.mvs
+			include : difference
+				HSerifs slabType CAP 0 df.leftSB xm df.mvs
+				intersection
+					MaskBelow Stroke
+					MaskRight [mix xm (df.rightSB - [HSwToV df.mvs]) 0.625]
 			include : MidHook.m df CAP
 
 		create-glyph "cyrl/enMidHook.\(suffix)" : glyph-proc
-			local df : include : DivFrame para.diversityM 3
+			local df : include : DivFrame para.diversityMM 3
 			include : df.markSet.p
 
 			local xm : df.middle + [HSwToV : 0.5 * df.mvs]
 			include : Body df.leftSB xm XH df.mvs
-			include : HSerifs slabType XH 0 df.leftSB xm df.mvs
+			include : difference
+				HSerifs slabType XH 0 df.leftSB xm df.mvs
+				intersection
+					MaskBelow Stroke
+					MaskRight [mix xm (df.rightSB - [HSwToV df.mvs]) 0.625]
 			include : MidHook.m df XH
 
 	select-variant 'H' 'H'
@@ -261,9 +273,10 @@ glyph-block Letter-Latin-Upper-H : begin
 	alias 'grek/Heta' 0x370 'leftHalfH'
 
 	create-glyph 'grek/heta' 0x371 : glyph-proc
-		include : MarkSet.e
-		include : LeftHalfBody SB RightSB XH
-		include : HSerifs SLAB-SMALL-HETA XH 0 SB RightSB
+		local df : include : DivFrame para.diversityF
+		include : df.markSet.e
+		include : LeftHalfBody df.leftSB df.rightSB XH
+		include : HSerifs SLAB-SMALL-HETA XH 0 df.leftSB df.rightSB
 
 	derive-composites 'HDescender' 0x2C67 'H/descBase' [CyrDescender.rSideJut RightSB 0]
 
@@ -329,7 +342,7 @@ glyph-block Letter-Latin-Upper-H : begin
 		include : VBar.r RightSB 0 CAP BBS
 		include : VBar.l  (SB + BBD) 0 CAP BBS
 		include : VBar.r (RightSB - BBD) 0 CAP BBS
-		include : HBar.m (SB + BBD) (RightSB - BBD)  (CAP * HBarPos) BBS
+		include : HBar.m (SB + BBD) (RightSB - BBD) (CAP * HBarPos) BBS
 		include : HBar.t SB (SB + BBD) CAP BBS
 		include : HBar.t (RightSB - BBD) RightSB CAP BBS
 		include : HBar.b SB (SB + BBD) 0 BBS
