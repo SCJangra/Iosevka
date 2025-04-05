@@ -1,5 +1,47 @@
 ## Modifications since last major version
 
+### 33.2.0
+
+* Add `flat-top` variants for `curly`, `straight-vertical-sides`, and `rounded-vertical-sides` forms of `W` and `w` (#2146).
+* Add `almost-flat-top` variants for `curly` forms of `W` and `w`.
+* Refine shape of the following characters:
+  - GREEK CAPITAL LETTER HETA (`U+0370`).
+  - GREEK SMALL LETTER HETA (`U+0371`).
+  - LATIN CAPITAL LETTER HALF H (`U+2C75`).
+  - LATIN SMALL LETTER HALF H (`U+2C76`).
+  - LATIN CAPITAL LETTER AU (`U+A736`).
+  - LATIN CAPITAL LETTER REVERSED HALF H (`U+A7F5`).
+  - LATIN SMALL LETTER REVERSED HALF H (`U+A7F6`).
+  - LATIN SMALL LIGATURE FFI (`U+FB03`).
+* Make certain characters slightly wider under Quasi-Proportional. Affected characters:
+  - ARMENIAN CAPITAL LETTER TO (`U+0539`).
+  - ARMENIAN SMALL LETTER TO (`U+0569`).
+  - ARMENIAN SMALL LIGATURE ECH YIWN (`U+0587`).
+* Fix variant application of `cv38` on `U+1DF0F`.
+
+
+### 33.1.0
+
+* Add `full-serifed` variants for `K` and `k`, and related letters (#2696).
+* Add `top-right-serifed` and `tri-serifed` variants for `K` and `k`, and related letters.
+* Add `cursive` variant for Greek Lower Theta (`θ`).
+* Add `closed-swash` variant for `Q` (#2392).
+* Add IPA localization form for Latin Lower `a` and `g`.
+* Add IPA localization form for Latin Lower G with Stroke (`ǥ`) (#2632).
+* Add variant selectors for Greek Lower Eta (`η`) and Kappa (`κ`).
+* Add Characters:
+  - LATIN SMALL LETTER TURNED T WITH CURL (`U+1DF0D`) (#1931).
+  - LATIN LETTER INVERTED GLOTTAL STOP WITH CURL (`U+1DF0E`) (#1931).
+  - LATIN LETTER STRETCHED C WITH CURL (`U+1DF0F`) (#1931).
+
+
+### 33.0.1
+
+* Make certain characters slightly wider under Quasi-Proportional. Affected characters:
+  - LATIN SMALL LETTER TH WITH STRIKETHROUGH (`U+1D7A`).
+* Allow Latin Alpha (`ɑ`) and Script G (`ɡ`) to use eared/earless variants of `a` (`cv36`) and `g` (`cv42`) respectively.
+
+
 ### 33.0.0
 
 * \[**Breaking**\] Adjusted width of spaces in quasi-porportional
