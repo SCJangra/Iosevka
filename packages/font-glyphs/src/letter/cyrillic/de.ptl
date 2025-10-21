@@ -7,11 +7,12 @@ glyph-module
 glyph-block Letter-Cyrillic-De : begin
 	glyph-block-import CommonShapes
 	glyph-block-import Common-Derivatives
-	glyph-block-import Mark-Adjustment : ExtendBelowBaseAnchors
+	glyph-block-import Mark-Adjustment : ExtendAboveBaseAnchors ExtendBelowBaseAnchors
 	glyph-block-import Letter-Cyrillic-Ze : CyrZe ZeConfig
 
 	glyph-block-export BottomExtension
 	local BottomExtension : (-LongVJut) + QuarterStroke
+	local TopExtension        LongVJut
 
 	glyph-block-export CyrDeBottom
 	define [CyrDeBottom left right _sw _desc] : glyph-proc
@@ -56,7 +57,7 @@ glyph-block Letter-Cyrillic-De : begin
 					else : list : curl (xTopRight + descenderOverflow) top
 			else : HBar.t xTopLeft xTopRight top swOuter
 
-		return : object desc xTopLeft xTopRight
+		return : object desc xTopLeft xTopRight swInner
 
 	define [CyrSoftDeShape df top _sw _desc fLower vSlab] : glyph-proc
 		local descenderOverflow : if SLAB SideJut ((df.rightSB - df.leftSB) * 0.075)
@@ -130,7 +131,7 @@ glyph-block Letter-Cyrillic-De : begin
 				hook   -- hook
 				stroke -- sw
 				xo     -- (0.5 * O)
-				op     -- 0.5
+				barPos -- 0.5
 			return : union [ze.Shape] [ze.AutoEndSerifL]
 
 		create-glyph "cyrl/Dzze.\(suffix)" : glyph-proc
@@ -146,6 +147,20 @@ glyph-block Letter-Cyrillic-De : begin
 			local de : include : CyrDeShape XH SB RightSB
 			eject-contour 'footR'
 			include : DzzeDescendershape de
+
+	create-glyph "cyrl/Dwe" 0xA680 : glyph-proc
+		include : MarkSet.capital
+		include : ExtendAboveBaseAnchors TopExtension
+		include : ExtendBelowBaseAnchors BottomExtension
+		local m : include : CyrDeShape CAP SB RightSB
+		include : VBar.l m.xTopLeft CAP (CAP + TopExtension) (m.swInner)
+
+	create-glyph "cyrl/dwe" 0xA681 : glyph-proc
+		include : MarkSet.e
+		include : ExtendAboveBaseAnchors TopExtension
+		include : ExtendBelowBaseAnchors BottomExtension
+		local m : include : CyrDeShape XH SB RightSB
+		include : VBar.l m.xTopLeft XH (XH + TopExtension) (m.swInner)
 
 	## Italic
 	glyph-block-export CyrDeItalicShapeT
@@ -182,12 +197,12 @@ glyph-block Letter-Cyrillic-De : begin
 			local xZeLeft  : dfLeft.leftSB  + df.width - dfLeft.width + OX
 			local xZeRight : dfLeft.rightSB + df.width - dfLeft.width - OX
 			local ze : CyrZe 1 sb XH Descender
-				left     -- xZeLeft
-				right    -- xZeRight
-				blend    -- 0.7
-				hook     -- Hook
-				overflow -- 0
-				stroke   -- df.mvs
+				left      -- xZeLeft
+				right     -- xZeRight
+				blend     -- 0.7
+				hook      -- Hook
+				xOverflow -- 0
+				stroke    -- df.mvs
 			include : union [ze.Shape] [ze.AutoEndSerifL]
 
 	select-variant 'cyrl/Dzze' 0xA688  (follow -- 'cyrl/ZeBottomSerifOnly')
