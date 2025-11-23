@@ -1,5 +1,44 @@
 ## Modifications since last major version
 
+### 33.3.5
+
+* Refine shape of the following characters:
+  - CYRILLIC CAPITAL LETTER DJE (`U+0402`).
+  - CYRILLIC CAPITAL LETTER TSHE (`U+040B`).
+  - CYRILLIC CAPITAL LETTER YAT (`U+0462`).
+  - CYRILLIC SMALL LETTER YAT (`U+0463`).
+  - CYRILLIC CAPITAL LETTER SHHA (`U+04BA`).
+  - CYRILLIC CAPITAL LETTER SHHA WITH DESCENDER (`U+0526`).
+  - CYRILLIC SMALL LETTER TALL YAT (`U+1C87`).
+  - COMBINING CYRILLIC LETTER YAT (`U+2DFA`).
+  - CYRILLIC CAPITAL LETTER IOTIFIED YAT (`U+A652`).
+  - CYRILLIC SMALL LETTER IOTIFIED YAT (`U+A653`).
+  - CYRILLIC CAPITAL LETTER HWE (`U+A694`).
+* Refine spacing of diagonal-tailed `i` and `j`.
+* Add Characters:
+  - LATIN CAPITAL LETTER VY (`U+A760`).
+  - LATIN SMALL LETTER VY (`U+A761`).
+
+
+### 33.3.4
+
+* Add Characters:
+  - COMBINING OPEN MARK BELOW (`U+1AB7`).
+  - COMBINING DOUBLE OPEN MARK BELOW (`U+1AB8`).
+  - SUN (`U+2609`) (#2935).
+  - CAUTION SIGN (`U+2621`) (#2935).
+  - PERMANENT PAPER SIGN (`U+267E`) (#2935).
+  - BLACK CIRCLE WITH WHITE DOT RIGHT (`U+2688`) (#2935).
+  - BLACK CIRCLE WITH TWO WHITE DOTS (`U+2689`) (#2935).
+  - WARNING SIGN (`U+26A0`) (#2935).
+* Refine shape of the following characters:
+  - MODIFIER LETTER UNASPIRATED (`U+02ED`).
+  - MODIFIER LETTER LEFT TACK (`U+AB6A`).
+  - MODIFIER LETTER RIGHT TACK (`U+AB6B`).
+* Refine serifs of Cyrillic Lower Dwe (`U+A681`) under italics.
+* Fix character mapping for: `U+2916`, `U+2B3B`, `U+2905` and `U+2B36`.
+
+
 ### 33.3.3
 
 * Add italic form for Cyrillic Lower Tswe (`U+A68F`).
