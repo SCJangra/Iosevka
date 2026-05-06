@@ -7,12 +7,12 @@ glyph-module
 glyph-block Letter-Latin-Ezh : begin
 	glyph-block-import CommonShapes
 	glyph-block-import Common-Derivatives
+	glyph-block-import Letter-Shared-Metrics : EFVJutLength
 	glyph-block-import Letter-Shared-Shapes : CurlyTail SerifedArcEnd PalatalHook RetroflexHook
-	glyph-block-import Letter-Latin-Upper-F : EFVJutLength
 
 	define [ConventionalTop df top bottom xTopLeft xTopRight xMidLeft yMidLeft stroke] : glyph-proc
 		include : tagged 'strokeTop' : HBar.t xTopLeft xTopRight top stroke
-		include : tagged 'strokeMiddle' : ExtLineRhsToLhs 0 [VSwToH stroke] xTopRight (top - stroke) xMidLeft yMidLeft
+		include : tagged 'strokeMiddle' : ExtLineRhsToLhs xTopRight (top - stroke) xMidLeft yMidLeft [VSwToH stroke]
 
 	define [CursiveTop df top bottom xTopLeft xTopRight xMidLeft yMidLeft stroke] : glyph-proc
 		define hook : Math.min Hook : [mix stroke (top - yMidLeft) 0.5] - stroke * 0.25
@@ -44,11 +44,11 @@ glyph-block Letter-Latin-Ezh : begin
 				curl [mix (df.leftSB + xMockTailDepth) xTopRight 4.00] (top - 4.00 * yTailDepth)
 
 		include : VBar.r xTopRight top (top - yFootHeight) [VSwToH xDiagWidth]
-		include : tagged 'strokeMiddle' : ExtLineRhsToLhs 0 [VSwToH stroke] xTopRight (top - yFootHeight) xMidLeft yMidLeft
+		include : tagged 'strokeMiddle' : ExtLineRhsToLhs xTopRight (top - yFootHeight) xMidLeft yMidLeft [VSwToH stroke]
 
 	define [StdTerminal df top bottom xArcMid yArcMid yMidLeft stroke hook origBar] : list
 		g4 xArcMid yArcMid
-		hookend bottom (sw -- stroke)
+		HookEnd bottom (sw -- stroke)
 		g4 (df.leftSB + OX) (bottom + hook)
 
 	define [HooklessTerminal df top bottom xArcMid yArcMid yMidLeft stroke hook origBar] : list
@@ -104,12 +104,12 @@ glyph-block Letter-Latin-Ezh : begin
 			dispiro
 				widths.rhs stroke
 				flat xMidLeft yMidLeft [heading Rightward]
-				curl [arch.adjust-x.top df.middle (sw -- stroke)] yMidLeft
+				curl [Arch.adjust-x.top df.middle (sw -- stroke)] yMidLeft
 				archv
 				terminal df top bottom xArcMid yArcMid yMidLeft stroke hook origBar
 
 		if fSerifed : begin
-			local { jutTop jutBot jutMid } : EFVJutLength (top - bottom) pyMidLeft stroke
+			local { jutTop jutBot jutMid } : EFVJutLength top bottom pyMidLeft stroke nothing hook
 			include : VSerif.dl xTopLeft top jutTop (VJutStroke * (stroke / Stroke))
 
 		return : object xArcMid yArcMid
@@ -346,22 +346,22 @@ glyph-block Letter-Latin-Ezh : begin
 		local yMidRight : RevEzhShape.yMidRight top bottom pyMidRight
 
 		include : HBar.t xTopLeft RightSB top
-		include : ExtLineLhsToRhs 0 [VSwToH Stroke] xTopLeft (top - Stroke) xMidRight yMidRight
+		include : ExtLineLhsToRhs xTopLeft (top - Stroke) xMidRight yMidRight [VSwToH Stroke]
 
 		include : dispiro
 			widths.lhs
 			flat xMidRight yMidRight [heading Leftward]
-			curl [arch.adjust-x.bot Middle] yMidRight
+			curl [Arch.adjust-x.bot Middle] yMidRight
 			archv
 			if hookless
 			: then : list
 				g4.down.mid (SB + OX) [RevEzhShape.yArcMid top bottom pyMidRight ada adb]
 			: else : list
 				g4 (SB + OX) [RevEzhShape.yArcMid top bottom pyMidRight ada adb]
-				hookend bottom
+				HookEnd bottom
 				g4 RightSB (bottom + Hook * ((top - bottom) / CAP))
 		if SLAB : begin
-			local { jutTop jutBot jutMid } : EFVJutLength (top - bottom) pyMidRight
+			local { jutTop jutBot jutMid } : EFVJutLength top bottom pyMidRight nothing nothing (Hook * ((top - bottom) / CAP))
 			include : VSerif.dr RightSB top jutTop
 	set RevEzhShape.yMidRight : lambda [top bottom pyMidRight] : mix bottom top pyMidRight
 	set RevEzhShape.yArcMid   : lambda [top bottom pyMidRight ada adb] : YSmoothMidL [RevEzhShape.yMidRight top bottom pyMidRight] bottom ada adb
