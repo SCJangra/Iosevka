@@ -62,23 +62,36 @@ export const OCCURRENT_PRECISION = 1 / 16;
 export const GEOMETRY_PRECISION = 1 / 4;
 export const BOOLE_RESOLUTION = 0x4000;
 
+// Derivative estimation using finite difference
+export const FINITE_DIFFERENCE_DELTA = 1 / 0x10000;
 export function derivativeFromFiniteDifference(c, t) {
-	const DELTA = 1 / 0x10000;
-	const forward2 = c.eval(t + 2 * DELTA);
-	const forward1 = c.eval(t + DELTA);
-	const backward1 = c.eval(t - DELTA);
-	const backward2 = c.eval(t - 2 * DELTA);
+	const forward2 = c.eval(t + 2 * FINITE_DIFFERENCE_DELTA);
+	const forward1 = c.eval(t + FINITE_DIFFERENCE_DELTA);
+	const backward1 = c.eval(t - FINITE_DIFFERENCE_DELTA);
+	const backward2 = c.eval(t - 2 * FINITE_DIFFERENCE_DELTA);
 	return new Vec2(
-		((1 / 12) * backward2.x -
-			(2 / 3) * backward1.x +
-			(2 / 3) * forward1.x -
-			(1 / 12) * forward2.x) /
-			DELTA,
-		((1 / 12) * backward2.y -
-			(2 / 3) * backward1.y +
-			(2 / 3) * forward1.y -
-			(1 / 12) * forward2.y) /
-			DELTA,
+		(backward2.x - 8 * backward1.x + 8 * forward1.x - forward2.x) /
+			(12 * FINITE_DIFFERENCE_DELTA),
+		(backward2.y - 8 * backward1.y + 8 * forward1.y - forward2.y) /
+			(12 * FINITE_DIFFERENCE_DELTA),
+	);
+}
+export function derivativeFromFiniteDifferenceFwd(c, t) {
+	const center = c.eval(t);
+	const forward1 = c.eval(t + FINITE_DIFFERENCE_DELTA);
+	const forward2 = c.eval(t + 2 * FINITE_DIFFERENCE_DELTA);
+	return new Vec2(
+		(-3 * center.x + 4 * forward1.x - forward2.x) / (2 * FINITE_DIFFERENCE_DELTA),
+		(-3 * center.y + 4 * forward1.y - forward2.y) / (2 * FINITE_DIFFERENCE_DELTA),
+	);
+}
+export function derivativeFromFiniteDifferenceBwd(c, t) {
+	const center = c.eval(t);
+	const backward1 = c.eval(t - FINITE_DIFFERENCE_DELTA);
+	const backward2 = c.eval(t - 2 * FINITE_DIFFERENCE_DELTA);
+	return new Vec2(
+		(3 * center.x - 4 * backward1.x + backward2.x) / (2 * FINITE_DIFFERENCE_DELTA),
+		(3 * center.y - 4 * backward1.y + backward2.y) / (2 * FINITE_DIFFERENCE_DELTA),
 	);
 }
 
@@ -95,6 +108,28 @@ export class OffsetCurve {
 		return {
 			x: c.x - (d.y / absD) * this.offset * this.contrast,
 			y: c.y + (d.x / absD) * this.offset,
+		};
+	}
+	derivative(t) {
+		return derivativeFromFiniteDifference(this, t);
+	}
+}
+
+export class TaperedOffsetCurve {
+	constructor(bone, offset0, offset1, contrast) {
+		this.bone = bone;
+		this.offset0 = offset0;
+		this.offset1 = offset1;
+		this.contrast = contrast;
+	}
+	eval(t) {
+		const c = this.bone.eval(t);
+		const d = this.bone.derivative(t);
+		const absD = Math.hypot(d.x, d.y);
+		const offset = mix(this.offset0, this.offset1, t);
+		return {
+			x: c.x - (d.y / absD) * offset * this.contrast,
+			y: c.y + (d.x / absD) * offset,
 		};
 	}
 	derivative(t) {
@@ -212,4 +247,20 @@ export class RoundCapCurve {
 
 		return new Vec2(dx, dy);
 	}
+}
+
+export function InPlaceTransformBez3Shape(tf, shape) {
+	if (!tf || Transform.isIdentity(tf)) return shape;
+	for (const c of shape) {
+		for (let i = 0; i < c.length; i++) c[i] = Bez3WithTransform(c[i], tf);
+	}
+}
+export function Bez3WithTransform(arc, tf) {
+	if (!tf || Transform.isIdentity(tf)) return arc;
+	return new TypoGeom.Arcs.Bez3(
+		Point.transformedXY(tf, Point.Type.Corner, arc.a.x, arc.a.y),
+		Point.transformedXY(tf, Point.Type.CubicStart, arc.b.x, arc.b.y),
+		Point.transformedXY(tf, Point.Type.CubicEnd, arc.c.x, arc.c.y),
+		Point.transformedXY(tf, Point.Type.Corner, arc.d.x, arc.d.y),
+	);
 }

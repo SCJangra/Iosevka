@@ -18,10 +18,13 @@ glyph-block Letter-Latin-V : begin
 		Stroke * [if SLAB para.vtipfineSlab para.vtipfine]
 		VCornerHalfWidth * 1.2
 	define VShapeFineStraight : 1.15 * (Stroke * CThin)
-	define pInktrap : 2 / 3
+	define pInktrap (2 / 3)
 	define VShapeMiddleWidth : Math.min [mix Stroke VShapeFineStraight pInktrap] [AdviceStroke 3]
 
-	define StraightSbShrink : mix 1 (DesignParameters.straightVShapeSbShrink * [StrokeWidthBlend 1 0.75]) : if SLAB 0.75 1
+	glyph-block-export VStraightSbShrink VStraightSbOffset
+	define VStraightSbShrink : mix 1 (DesignParameters.straightVShapeSbShrink * [StrokeWidthBlend 1 0.75]) : if SLAB 0.75 1
+	define VStraightSbOffset : OX * [StrokeWidthBlend 1 2]
+
 	define [VShapeTopFlat top] : Math.min (top * 0.9) (top - [if SLAB Stroke 0])
 
 	glyph-block-export VShapeOutline
@@ -29,7 +32,7 @@ glyph-block Letter-Latin-V : begin
 		define cornerHW : VCornerHalfWidth * (sw / Stroke)
 		define clearance (-OX)
 
-		local sbScale : if fBarStraight StraightSbShrink 1
+		local sbScale : if fBarStraight VStraightSbShrink 1
 		define vxStartL : [mix 0        df.leftSB  sbScale] + clearance
 		define vxStartR : [mix df.width df.rightSB sbScale] - clearance
 		define vxEndL : df.middle - cornerHW + clearance
@@ -65,14 +68,14 @@ glyph-block Letter-Latin-V : begin
 	define [VShape] : with-params [df fBarStraight top [sw Stroke]] : glyph-proc
 		define cornerHW : VCornerHalfWidth * (sw / Stroke)
 
-		local sbScale : if fBarStraight StraightSbShrink 1
+		local sbScale : if fBarStraight VStraightSbShrink 1
 		define vxStartL : mix 0        df.leftSB  sbScale
 		define vxStartR : mix df.width df.rightSB sbScale
 		define vxEndL : df.middle - cornerHW
 		define vxEndR : df.middle + cornerHW
 
 		if fBarStraight : do
-			define dgCor : DiagCor (2 * top) Width 0 (2 * sw)
+			define dgCor : DiagCor (top - 0) (vxEndL - vxStartL)
 			define startSW : dgCor * sw
 			define midSW : dgCor * VShapeMiddleWidth * (sw / Stroke)
 			define endSW : Math.min sw : VShapeFineStraight * (sw / Stroke)
@@ -99,7 +102,7 @@ glyph-block Letter-Latin-V : begin
 				quadControls 0 VCurviness 9 unimportant
 				g4   vxEndR   0                   [widths.rhs fine]
 
-			#bottom cap
+			# bottom cap
 			include : tagged 'bottomCap' : VBottomCapShape df fBarStraight sw
 
 	glyph-block-export VHookRightShape
@@ -107,23 +110,39 @@ glyph-block Letter-Latin-V : begin
 		include : VShape df fBarStraight top (sw -- sw)
 		eject-contour 'strokeUp'
 		eject-contour 'bottomCap'
-		include : VBottomCapShape df fBarStraight sw
-		include : dispiro
+
+		define cornerHW : VCornerHalfWidth * (sw / Stroke)
+		define fine     : VShapeFine       * (sw / Stroke)
+		include : union [VBottomCapShape df fBarStraight sw] : dispiro
 			widths.rhs sw
-			straight.left.start (df.rightSB + hookWidthOuter) ((top - O) - sw)
+			straight.left.start (df.rightSB + hookWidthOuter - [Math.min 0 : 1.2 * sw * TanSlope]) ((top - O) - sw)
 			g4 (df.rightSB - hookWidthInner) (top - TailY - 0.5 * sw)
 			quadControls 0.4 0.75 64 unimportant
-			g4 (df.middle + VCornerHalfWidth * (sw / Stroke)) 0 [widths.rhs : VShapeFine * (sw / Stroke)]
+			g4 (df.middle + cornerHW) 0 [widths.rhs fine]
+
+	glyph-block-export VHookLeftShape
+	define [VHookLeftShape] : with-params [df fBarStraight top [sw Stroke] [hookWidthOuter (TailX / 3)] [hookWidthInner (TailX / 3)]] : glyph-proc
+		include : VShape df fBarStraight top (sw -- sw)
+		eject-contour 'strokeDown'
+		eject-contour 'bottomCap'
+
+		define cornerHW : VCornerHalfWidth * (sw / Stroke)
+		define fine     : VShapeFine       * (sw / Stroke)
+		include : union [VBottomCapShape df fBarStraight sw] : dispiro
+			widths.lhs sw
+			straight.right.start (df.leftSB - hookWidthOuter - [Math.max 0 : 1.2 * sw * TanSlope]) ((top - O) - sw)
+			g4 (df.leftSB + hookWidthInner) (top - TailY - 0.5 * sw)
+			quadControls 0.6 0.75 64 unimportant
+			g4 (df.middle - cornerHW) 0 [widths.lhs fine]
 
 	define [VLoopShape] : with-params [df fBarStraight top [sw Stroke]] : glyph-proc
 		include : VShape df fBarStraight top (sw -- sw)
 		eject-contour 'strokeDown'
 		eject-contour 'bottomCap'
-		include : VBottomCapShape df fBarStraight sw
 
 		define cornerHW : VCornerHalfWidth * (sw / Stroke)
-		define cornerSw : VShapeFine * (sw / Stroke)
-		define sbScale : if fBarStraight StraightSbShrink 1
+		define fine     : VShapeFine       * (sw / Stroke)
+		define sbScale : if fBarStraight VStraightSbShrink 1
 		define vxStartL : mix 0 df.leftSB sbScale
 		define vxEndL : df.middle - cornerHW
 		define swLoop : AdviceStroke 4.5
@@ -131,23 +150,25 @@ glyph-block Letter-Latin-V : begin
 		define xLoopR : df.middle + [HSwToV : 0.5 * swLoop]
 		define yLoopB : Math.max (top - (xLoopR - xLoopL)) (0.5 * top - 0.5 * swLoop)
 
-		local swLoopMix1 : mix swLoop [mix sw cornerSw 0.5] 0.375
-		local swLoopMix2 : mix swLoop [mix sw cornerSw 0.5] 0.75
+		local coFine : mix sw fine 0.5
+		local swLoopMix1 : mix swLoop coFine 0.375
+		local swLoopMix2 : mix swLoop coFine 0.750
 
-		include : dispiro
-			flat (df.leftSB * 0.5)       yLoopB [widths.lhs swLoop]
+		include : union [VBottomCapShape df fBarStraight sw] : dispiro
+			widths.lhs swLoop
+			flat [mix 0 df.leftSB 0.5]   yLoopB
 			curl [mix xLoopL xLoopR 0.5] yLoopB
 			archv
 			g4   (xLoopR - O) [mix yLoopB top 0.5]
 			Arch.lhs top (swBefore -- swLoop) (sw -- swLoopMix1) (swAfter -- swLoopMix2)
-			g4   xLoopL       [mix top yLoopB 0.5] [widths.lhs swLoopMix2]
-			flat [mix vxStartL vxEndL : if fBarStraight 0.5 0.425] [mix top 0 0.5] [widths.lhs : mix sw cornerSw 0.5]
-			curl vxEndL 0 [widths.lhs cornerSw]
+			g4   (xLoopL + 0) [mix top yLoopB 0.5] [widths.lhs swLoopMix2]
+			flat [mix vxStartL vxEndL : if fBarStraight 0.500 0.425] [mix top 0 0.5] [widths.lhs coFine]
+			curl vxEndL 0 [widths.lhs fine]
 
 	glyph-block-export VSerifs
 	define [VSerifs] : with-params [df fBarStraight top [sw Stroke] [swRef sw]] : begin
-		local sbScale  : if fBarStraight StraightSbShrink 1
-		local sbOffset : if fBarStraight (OX * [StrokeWidthBlend 1 2]) 0
+		local sbScale  : if fBarStraight VStraightSbShrink 1
+		local sbOffset : if fBarStraight VStraightSbOffset 0
 		local sf : SerifFrame top 0 ([mix 0 df.leftSB sbScale] - sbOffset) ([mix df.width df.rightSB sbScale] + sbOffset) (swRef -- swRef) (swSerif -- sw)
 		return : composite-proc sf.lt.full sf.rt.full
 
@@ -155,10 +176,19 @@ glyph-block Letter-Latin-V : begin
 
 	glyph-block-export VMotionSerifs
 	define [VMotionSerifs] : with-params [df fBarStraight top [sw Stroke] [swRef sw]] : begin
-		local sbScale  : if fBarStraight StraightSbShrink 1
-		local sbOffset : if fBarStraight (OX * [StrokeWidthBlend 1 2]) 0
+		local sbScale  : if fBarStraight VStraightSbShrink 1
+		local sbOffset : if fBarStraight VStraightSbOffset 0
 		local sf : SerifFrame top 0 ([mix 0 df.leftSB sbScale] - sbOffset) ([mix df.width df.rightSB sbScale] + sbOffset) (swRef -- swRef) (swSerif -- sw)
 		return : composite-proc sf.lt.outer
+
+	glyph-block-export VSlashOverlayShape
+	define [VSlashOverlayShape] : with-params [df fBarStraight top [swRef Stroke]] : begin
+		local cornerHW : VCornerHalfWidth * (swRef / Stroke)
+		local sbScale  : if fBarStraight VStraightSbShrink 1
+		local vxStartR : mix df.width df.rightSB sbScale
+		local vxEndR   : df.middle + cornerHW
+		return : with-transform [Translate (df.middle - vxStartR) 0]
+			ExtLineCenter vxEndR 0 vxStartR top ([AdviceStroke 6] * (swRef / Stroke)) 0.1
 
 	define VStandardConfig : SuffixCfg.weave
 		object # straight bar
@@ -187,6 +217,14 @@ glyph-block Letter-Latin-V : begin
 				xLink -- Middle
 				x     -- (Middle + [HSwToV HalfStroke] + [PalatalHook.adviceGap Stroke])
 				y     -- 0
+
+		create-glyph "VSlash.\(suffix)" : glyph-proc
+			include [refer-glyph "V.\(suffix)"] AS_BASE ALSO_METRICS
+			include : VSlashOverlayShape [DivFrame 1] fStraightBar CAP
+
+		create-glyph "vSlash.\(suffix)" : glyph-proc
+			include [refer-glyph "v.\(suffix)"] AS_BASE ALSO_METRICS
+			include : VSlashOverlayShape [DivFrame 1] fStraightBar XH
 
 		create-glyph "VHookRight.\(suffix)" : glyph-proc
 			include : MarkSet.capital
@@ -234,17 +272,15 @@ glyph-block Letter-Latin-V : begin
 				include : Serifs          [DivFrame 1] fStraightBar (Ascender - (yBarPos - 0.5 * subDf.mvs))
 				eject-contour 'serifRT'
 
-	define [VCursiveShapeBarPos k] : mix SB RightSB k
 	define [VCursiveShape] : with-params [k top [sw Stroke]] : glyph-proc
-		define xBar : VCursiveShapeBarPos k
+		define xBar : VCursiveShape.xBarPos k
 		define xArcRight : RightSB - OX
 		define yArcRight : [mix 0  top     0.6] - sw * 0.2
 		define xArcEnd   : [mix SB RightSB 0.8] + sw * 0.375
 		define yArcEnd   : top - O
-		define rInY : 1 * DefaultTightBendInnerRadius
+		define rInY : 1 * TightBendInnerRadius
 		define xArcMidBottom : Arch.adjust-x.bot (xBar + [HSwToV : sw + rInY]) sw
 		define yArcMidBottom : 0 + O
-
 		include : dispiro
 			widths.lhs sw
 			flat xBar top [heading Downward]
@@ -254,21 +290,21 @@ glyph-block Letter-Latin-V : begin
 			archv.superness 2
 			g4 xArcRight yArcRight
 			g4 xArcEnd   yArcEnd
-
 		set-base-anchor 'palatalHookAttach'
 			mix xArcMidBottom xArcRight 0.5
 			mix yArcMidBottom yArcRight : archv.yFromX 0.5 2
+	set VCursiveShape.xBarPos : function [k] : mix SB RightSB k
 
 	define VCursiveConfig : object
 		cursiveSerifless     { (1/24) false }
 		cursiveSerifed       { (1/16) true  }
 
-	foreach { suffix { pxBar fDoSerif } } [Object.entries VCursiveConfig] : do
+	foreach { suffix { pxBar doSerif } } [Object.entries VCursiveConfig] : do
 		create-glyph "v.\(suffix)" : glyph-proc
 			include : MarkSet.e
 			include : VCursiveShape pxBar XH Stroke
-			if fDoSerif : begin
-				local xBar : VCursiveShapeBarPos pxBar
+			if doSerif : begin
+				local xBar : VCursiveShape.xBarPos pxBar
 				include : tagged 'serifLT' : HSerif.lt xBar XH (SideJut + (xBar - SB))
 
 		create-glyph "vPalatalHook.\(suffix)" : glyph-proc
@@ -279,6 +315,11 @@ glyph-block Letter-Latin-V : begin
 				y       -- 0
 				yAttach -- attach.y
 
+		create-glyph "vSlash.\(suffix)" : glyph-proc
+			include [refer-glyph "v.\(suffix)"] AS_BASE ALSO_METRICS
+			local xBar : VCursiveShape.xBarPos pxBar
+			include : ExtLineCenter [mix (xBar + [HSwToV HalfStroke]) Middle (-1)] 0 Middle XH [AdviceStroke 6] 0.1
+
 	select-variant 'V' 'V'
 	link-reduced-variant 'V/sansSerif' 'V' MathSansSerif
 	select-variant 'smcpV' 0x1D20 (shapeFrom -- 'v') (follow -- 'V')
@@ -286,10 +327,13 @@ glyph-block Letter-Latin-V : begin
 	select-variant 'v' 'v'
 	link-reduced-variant 'v/sansSerif' 'v' MathSansSerif
 
-	select-variant "vPalatalHook" 0x1D8C (follow -- 'v')
+	select-variant 'vPalatalHook' 0x1D8C (follow -- 'v')
 
 	select-variant 'vHookRight' 0x2C71
 	select-variant 'vLoop'      0x2C74
+
+	select-variant 'VSlash' 0xA75E (follow -- 'V')
+	select-variant 'vSlash' 0xA75F (follow -- 'v')
 
 	select-variant 'cyrl/Izhitsa' 0x474 (shapeFrom -- 'VHookRight')
 	select-variant 'cyrl/izhitsa' 0x475 (shapeFrom -- 'vHookRight')
@@ -330,6 +374,11 @@ glyph-block Letter-Latin-V : begin
 		create-forked-glyph 'vScript.roundedSerifed'       : tagged 'serifLT' : HSerif.mt (SB + [HSwToV HalfStroke]) XH Jut
 
 	select-variant 'vScript' 0x28B
+
+	derive-composites 'vScriptPalatalHook' 0x1DF39 'vScript' : PalatalHook.r
+		x -- [mix [Arch.adjust-x.bot Middle] RightSB 0.75]
+		y -- 0
+		yAttach -- [mix O SmallArchDepthA : archv.yFromX 0.75]
 
 	glyph-block-import Letter-Blackboard : BBS BBD
 	glyph-block-export BBVShape BBVInnerMaskShape BBVOuterMaskShape

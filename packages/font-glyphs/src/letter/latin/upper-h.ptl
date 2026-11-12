@@ -135,7 +135,7 @@ glyph-block Letter-Latin-Upper-H : begin
 		local-parameter : top
 		local-parameter : slabType
 		local-parameter : fTailed  -- false
-		local-parameter : stroke   -- [Math.min df.mvs [AdviceStroke 2.75 df.adws] [AdviceStroke 2 (0.75 * df.adws)]]
+		local-parameter : stroke   -- [Math.min [df.adviceThinnerStroke 2.75 1.00] [df.adviceThinnerStroke 2.00 0.75]]
 		local-parameter : serifTR  -- SLAB
 
 		local subDf : DivFrame (0.75 * df.adws) 2
@@ -257,8 +257,8 @@ glyph-block Letter-Latin-Upper-H : begin
 				set-mark-anchor 'cvDecompose' 0 0
 				include : EnGheShape enGheDf XH slabType fTailed (serifTR -- serifGhe)
 
-		select-variant "cyrl/EnGhe.\(suffix)" (follow -- 'cyrl/EnGhe/GhePart')
-		select-variant "cyrl/enghe.\(suffix)" (follow -- 'cyrl/enghe/ghePart')
+		select-variant "cyrl/EnGhe.\(suffix)" (follow -- 'cyrl/EnGhe/Ghe')
+		select-variant "cyrl/enghe.\(suffix)" (follow -- 'cyrl/enghe/ghe')
 
 		define hwairDf : DivFrame para.advanceScaleMM 3
 
@@ -307,7 +307,7 @@ glyph-block Letter-Latin-Upper-H : begin
 			include [refer-glyph "smcpH.\(suffix)"] AS_BASE ALSO_METRICS
 			include : OverlayStrokeShape XH slabType
 
-		create-glyph "smcpHFaucal.\(suffix)" : glyph-proc
+		create-glyph "smcpHDblBar.\(suffix)" : glyph-proc
 			include [refer-glyph "smcpH.\(suffix)"] AS_BASE ALSO_METRICS
 			eject-contour 'crossbar'
 			local bp1 : mix 0 XH : HBarPos + 0.05
@@ -364,7 +364,7 @@ glyph-block Letter-Latin-Upper-H : begin
 
 	select-variant 'HStroke' 0x126 (follow -- 'H')
 	select-variant 'smcpHStroke' (follow -- 'H')
-	select-variant 'smcpHFaucal' (follow -- 'H')
+	select-variant 'smcpHDblBar' (follow -- 'H')
 
 	select-variant 'cyrl/EnHook' 0x4C7 (shapeFrom -- 'Heng') (follow -- 'cyrl/En/descBase')
 	select-variant 'cyrl/enHook' 0x4C8 (shapeFrom -- 'smcpHeng') (follow -- 'cyrl/en/descBase')

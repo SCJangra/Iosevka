@@ -10,7 +10,21 @@ glyph-block Orthography : begin
 
 	########## Latin letters
 
+	# Italic forms
+	orthographic-italic 'latn/yatSakha'      0xAB60
+	orthographic-italic 'aRoundTop'          0x1DF6B
+	orthographic-italic 'dotlessaiDiphthong' null
+	orthographic-italic 'dotlessiPigtail'    null
+	orthographic-italic 'OFlourish'          0x1DF72
+	orthographic-italic 'oFlourish'          0x1DF73
+
+	# Accented forms
+	CreateAccentedComposition 'aiDiphthong' 0x1DF6F 'dotlessaiDiphthong' 'tittleAbove'
+	CreateAccentedComposition 'iPigtail'    0x1DF70 'dotlessiPigtail'    'tittleAbove'
+
 	# Link localization forms
+	link-gr LocalizedForm.NSM  'Eng'                 'Eng.NSM'
+	
 	link-gr LocalizedForm.PLK  'CAcute'              'CAcute.PLK'
 	link-gr LocalizedForm.PLK  'cAcute'              'cAcute.PLK'
 	link-gr LocalizedForm.PLK  'NAcute'              'NAcute.PLK'
@@ -60,9 +74,14 @@ glyph-block Orthography : begin
 	link-gr LocalizedForm.IPPH 'aBreveHook'          'aBreveHook/doubleStorey'
 	link-gr LocalizedForm.IPPH 'aBreveTilde'         'aBreveTilde/doubleStorey'
 	link-gr LocalizedForm.IPPH 'aBelowdotBreve'      'aBelowdotBreve/doubleStorey'
+	link-gr LocalizedForm.IPPH 'aBar'                'aBar/doubleStorey'
 	link-gr LocalizedForm.IPPH 'bStroke'             'bBar'
 	link-gr LocalizedForm.IPPH 'dCaron'              'dWedge'
 	link-gr LocalizedForm.IPPH 'dStroke'             'dBar'
+	link-gr LocalizedForm.IPPH 'f'                   'fLenis'
+	link-gr LocalizedForm.IPPH 'fTildeOver'          'fLenisTildeOver'
+	link-gr LocalizedForm.IPPH 'fPalatalHook'        'fLenisPalatalHook'
+	link-gr LocalizedForm.IPPH 'fDot'                'fLenisDot'
 	link-gr LocalizedForm.IPPH 'g'                   'g/doubleStorey'
 	link-gr LocalizedForm.IPPH 'gCircumflex'         'gCircumflex/doubleStorey'
 	link-gr LocalizedForm.IPPH 'gBreve'              'gBreve/doubleStorey'
@@ -72,7 +91,7 @@ glyph-block Orthography : begin
 	link-gr LocalizedForm.IPPH 'gCaron'              'gWedge/doubleStorey'
 	link-gr LocalizedForm.IPPH 'gAcute'              'gAcute/doubleStorey'
 	link-gr LocalizedForm.IPPH 'gMacron'             'gMacron/doubleStorey'
-	link-gr LocalizedForm.IPPH 'smcpHStroke'         'smcpHFaucal'
+	link-gr LocalizedForm.IPPH 'smcpHStroke'         'smcpHDblBar'
 	link-gr LocalizedForm.IPPH 'LCaron'              'LWedge'
 	link-gr LocalizedForm.IPPH 'lCaron'              'lWedge'
 	link-gr LocalizedForm.IPPH 'tCaron'              'tWedge'
@@ -116,22 +135,25 @@ glyph-block Orthography : begin
 	orthographic-italic 'cyrl/peDescender'    0x525
 	orthographic-italic 'cyrl/dzzhe'          0x52B
 	orthographic-italic 'cyrl/dche'           0x52D
+	orthographic-italic 'cyrl/deLongLeg'      0x1C81
 	orthographic-italic 'cyrl/teThreeLeg'     0x1C85
 	orthographic-italic 'cyrl/tje'            0x1C8A
 	orthographic-italic 'cyrl/este'           null
 	orthographic-italic 'cyrl/revtse'         0xA661
+	orthographic-italic 'cyrl/dwe'            0xA681
 	orthographic-italic 'cyrl/dzze'           0xA689
 	orthographic-italic 'cyrl/teMidHook'      0xA68B
 	orthographic-italic 'cyrl/tswe'           0xA68F
+	orthographic-italic 'cyrl/tche'           0xA693
 	orthographic-italic 'cyrl/shwe'           0xA697
-	orthographic-italic 'latn/yatSakha'       0xAB60
 
 	# Accented forms
 	CreateAccentedComposition 'cyrl/iBreve' 0x439 'cyrl/i'   'breveAbove'
 	CreateAccentedComposition 'cyrl/gje'    0x453 'cyrl/ghe' 'acuteAbove'
 	CreateAccentedComposition 'cyrl/iGrave' 0x45D 'cyrl/i'   'graveAbove'
 
-	CreateAccentedComposition 'cyrl/iShortTail' 0x48B 'cyrl/iTail' 'breveAbove'
+	CreateAccentedComposition 'cyrl/IBreveTail' 0x48A 'cyrl/ITail' 'breveAbove'
+	CreateAccentedComposition 'cyrl/iBreveTail' 0x48B 'cyrl/iTail' 'breveAbove'
 
 	# Link localization forms
 	link-gr LocalizedForm.SRB.Upright 'cyrl/be'            'cyrl/be.SRB'
